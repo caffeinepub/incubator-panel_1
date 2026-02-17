@@ -1,0 +1,324 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Incubator Panel — Touchscreen industrial UI with ESP32 polling & controls (frontend)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Create a consistent industrial dark theme UI system optimized for tablet touch (high contrast, large targets, smooth transitions; avoid blue/purple dominance).",
+      "acceptanceCriteria": [
+        "All screens share a consistent dark industrial visual style (backgrounds, surfaces, borders, typography).",
+        "Primary interactive controls meet touch sizing expectations (e.g., large buttons, clear spacing).",
+        "Transitions between screens are smooth and consistent."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "create",
+          "description": "Define global dark industrial theme tokens (CSS variables used by Tailwind/shadcn), typography scale, spacing defaults, and reusable transition timings; ensure accent colors are not blue/purple-dominant. Use the shadcn-ui theming approach; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Align Tailwind theme extensions with the industrial palette and touch-first sizing (e.g., larger radii/spacing utilities where appropriate) while keeping darkMode via class."
+        },
+        {
+          "path": "frontend/src/components/layout/PanelLayout.tsx",
+          "operation": "create",
+          "description": "Create a shared touchscreen-optimized layout (header + content + bottom control area) with consistent surfaces, borders, and spacing. Prefer shadcn-ui primitives (e.g., Card/Button) for consistent styling; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/layout/ScreenTransition.tsx",
+          "operation": "create",
+          "description": "Provide a simple, consistent screen transition wrapper (CSS-based) to be reused for navigation changes and key UI state changes (e.g., alarm/offline banners)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Implement the Main Dashboard screen with animated circular gauges and live incubation/status widgets.",
+      "acceptanceCriteria": [
+        "Temperature and humidity are displayed as large circular gauges and animate smoothly when values change.",
+        "Dashboard shows Day X of 21 and days remaining using the latest polled data.",
+        "Dashboard shows system status text and visually distinguishes Alarm state (e.g., color/accent change) without relying solely on motion.",
+        "Egg turning countdown displays using the value returned from the controller (turn_time)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/gauges/CircularGauge.tsx",
+          "operation": "create",
+          "description": "Implement a reusable SVG-based circular gauge with smooth animated progress/value updates, large numeric readout, and optional status accent ring for alarm/states."
+        },
+        {
+          "path": "frontend/src/screens/DashboardScreen.tsx",
+          "operation": "create",
+          "description": "Build the Dashboard screen layout: two prominent circular gauges (Temp °C, Humidity %), Day X of 21, days remaining, system status text with non-motion alarm distinction, and egg turning countdown (turn_time). Use PanelLayout and ScreenTransition for consistent look/feel."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "create",
+          "description": "Wire the Dashboard screen into the app as the default primary screen and ensure screen transitions are applied consistently."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add touch-friendly bottom control buttons on the Dashboard and implement feedback for actions.",
+      "acceptanceCriteria": [
+        "All four buttons are present on the Dashboard and are easily tappable on a tablet form factor.",
+        "Species Selection and Settings navigate to their respective screens.",
+        "Manual Egg Turn triggers the /manualTurn request and shows a clear success/error feedback state in the UI.",
+        "Alarm Mute button is present and provides visible feedback when tapped (even if it is a no-op pending device endpoint support)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/controls/BottomControlBar.tsx",
+          "operation": "create",
+          "description": "Create a touchscreen bottom control bar with four large buttons (Manual Egg Turn, Species Selection, Settings, Alarm Mute) styled to match the industrial theme. Use shadcn-ui Button (and optional Toast/Alert patterns if present) for consistent interactions; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/screens/DashboardScreen.tsx",
+          "operation": "modify",
+          "description": "Integrate BottomControlBar into the Dashboard; wire Manual Egg Turn to the ESP32 command layer with loading + success/error UI; implement Alarm Mute as a local UI feedback toggle (no new ESP32 calls)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Implement navigation actions from the bottom buttons to Species Selection and Settings screens (without introducing extra primary screens)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Create the Species Selection screen with large icon buttons that send mode commands and show feedback.",
+      "acceptanceCriteria": [
+        "Species Selection screen contains 5 large, clearly labeled icon buttons: Chicken, Duck, Quail, Goose, Custom.",
+        "Tapping a species issues GET /setMode?value=<SpeciesName> to the configured ESP32 base URL.",
+        "UI shows success/error feedback for mode change and reflects the updated mode from subsequent /status polling."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/screens/SpeciesSelectionScreen.tsx",
+          "operation": "create",
+          "description": "Implement the Species Selection screen with five large labeled icon buttons; on tap, call the ESP32 command layer to set mode and show loading/success/error feedback, then return to Dashboard or clearly indicate the active mode."
+        },
+        {
+          "path": "frontend/src/components/species/SpeciesTileButton.tsx",
+          "operation": "create",
+          "description": "Create a reusable large touch-friendly species tile button that renders an icon from static assets plus an English label; ensure consistent industrial styling and large hit targets."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register/wire Species Selection as a primary navigable screen from the Dashboard control bar."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Create the Settings screen with temperature/humidity sliders, egg turning interval control, and Save that sends commands and persists locally.",
+      "acceptanceCriteria": [
+        "Settings screen includes temperature slider, humidity slider, egg turning interval input/control, and a Save Settings button.",
+        "Pressing Save sends /setTemp?value=<temp> and /setHumidity?value=<humidity> to the ESP32 base URL and displays success/error feedback.",
+        "Settings chosen by the user persist across reloads (e.g., via local storage) and are used to initialize the Settings UI on next load."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/screens/SettingsScreen.tsx",
+          "operation": "create",
+          "description": "Implement Settings screen controls (temp slider, humidity slider, egg turning interval control) and a Save button. Use shadcn-ui form primitives (e.g., Button, Input, Slider if available) for consistent styling; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/state/useLocalSettings.ts",
+          "operation": "create",
+          "description": "Create a local settings hook/store backed by localStorage to persist and hydrate UI settings (temperature setpoint, humidity setpoint, turning interval, and other UI preferences needed by the request)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register/wire Settings as a primary navigable screen from the Dashboard control bar, and ensure it hydrates from persisted settings on load."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Implement ESP32 HTTP polling (/status every 3s) and command requests with robust error handling and loading states across screens.",
+      "acceptanceCriteria": [
+        "The app polls /status every 3 seconds while on the Dashboard and keeps data fresh when navigating between screens (no stale UI).",
+        "The JSON fields temp, humidity, day, days_left, status, turn_time, mode are all displayed somewhere appropriate and update when the polled values change.",
+        "If the ESP32 is unreachable or returns invalid JSON, the UI shows a clear offline/error state without crashing.",
+        "Each command endpoint shows a loading state and a success/error result in the UI."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/esp32Client.ts",
+          "operation": "create",
+          "description": "Implement a small HTTP client for ESP32 GET requests that uses the saved base URL, supports timeouts/cancellation, parses JSON safely, and returns structured errors suitable for UI display (including CORS/network failures)."
+        },
+        {
+          "path": "frontend/src/hooks/useIncubatorStatus.ts",
+          "operation": "create",
+          "description": "Use React Query to poll the ESP32 status every 3 seconds (with appropriate refetch behavior) and expose the latest status data + offline/error states for screens. Use the provided React Query stack; verify the component's usage instructions before implementing (core-infrastructure provides app entry + React Query context)."
+        },
+        {
+          "path": "frontend/src/hooks/useEsp32Commands.ts",
+          "operation": "create",
+          "description": "Create React Query mutations (or equivalent) for /manualTurn, /setTemp, /setHumidity, /setMode with shared loading/success/error handling hooks for consistent UI feedback."
+        },
+        {
+          "path": "frontend/src/screens/DashboardScreen.tsx",
+          "operation": "modify",
+          "description": "Bind all live fields (temp, humidity, day, days_left, status, turn_time, mode) to the polling hook; add a clear offline/error banner state and ensure gauge/status updates animate smoothly without crashing on bad data."
+        },
+        {
+          "path": "frontend/src/screens/SpeciesSelectionScreen.tsx",
+          "operation": "modify",
+          "description": "Use the command hook for /setMode and reflect mode updates from status polling; show loading/success/error states."
+        },
+        {
+          "path": "frontend/src/screens/SettingsScreen.tsx",
+          "operation": "modify",
+          "description": "Use the command hook for /setTemp and /setHumidity; show loading/success/error states and keep the UI responsive for touch."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Add editable/persisted ESP32 base URL configuration in the UI and ensure all requests use it.",
+      "acceptanceCriteria": [
+        "User can edit and save the ESP32 base URL from within the UI.",
+        "All polling and command requests use the saved base URL.",
+        "Base URL persists across reloads."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/screens/SettingsScreen.tsx",
+          "operation": "modify",
+          "description": "Add an ESP32 Base URL input (English label + helper text) with Save/apply behavior; persist via the local settings store and ensure it updates the ESP32 client used by polling/commands."
+        },
+        {
+          "path": "frontend/src/state/useLocalSettings.ts",
+          "operation": "modify",
+          "description": "Extend persisted settings to include ESP32 base URL with validation/sanitization (e.g., trimming, ensuring http/https prefix) and safe defaults."
+        },
+        {
+          "path": "frontend/src/lib/esp32Client.ts",
+          "operation": "modify",
+          "description": "Ensure all ESP32 polling/command requests resolve URLs from the persisted base URL and handle invalid base URL as a user-visible configuration error."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Provide a kiosk-friendly UI mode with an in-app toggle and visible Help/About guidance for Android kiosk/pinning setup.",
+      "acceptanceCriteria": [
+        "The UI renders cleanly in full-screen tablet dimensions and remains usable without page scrolling for the main dashboard controls.",
+        "There is a clear optional kiosk UI toggle/state that reduces accidental navigation within the app.",
+        "App includes user-facing guidance (English) on configuring Android kiosk/pinning behavior (acknowledging OS-level setup is required)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/state/useKioskMode.ts",
+          "operation": "create",
+          "description": "Implement a persisted kiosk UI mode flag (localStorage) that can be toggled from the UI and consumed by layout/navigation to reduce accidental navigation."
+        },
+        {
+          "path": "frontend/src/components/layout/PanelLayout.tsx",
+          "operation": "modify",
+          "description": "Adapt layout for kiosk mode (e.g., hide nonessential navigation affordances, emphasize always-on dashboard controls, constrain content to avoid scrolling) while keeping the three primary screens reachable as required."
+        },
+        {
+          "path": "frontend/src/components/help/HelpAboutPanel.tsx",
+          "operation": "create",
+          "description": "Create a visible Help/About section (English) describing Android screen pinning/kiosk guidance and startup considerations, explicitly noting OS-level setup is required."
+        },
+        {
+          "path": "frontend/src/screens/SettingsScreen.tsx",
+          "operation": "modify",
+          "description": "Add a kiosk UI toggle control and render the Help/About guidance section within Settings (no new primary screen) so it remains accessible."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Add navigation between Dashboard, Species Selection, and Settings, ensuring all user-facing text is English.",
+      "acceptanceCriteria": [
+        "Users can navigate between Dashboard, Species Selection, and Settings using the provided buttons.",
+        "All labels, buttons, and helper text shown in the UI are English."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Implement app-level navigation state for the three primary screens and ensure all navigation is wired (Dashboard ↔ Species Selection ↔ Settings) with consistent transitions."
+        },
+        {
+          "path": "frontend/src/screens/DashboardScreen.tsx",
+          "operation": "modify",
+          "description": "Ensure the bottom control bar labels and any helper text are English and navigate correctly."
+        },
+        {
+          "path": "frontend/src/screens/SpeciesSelectionScreen.tsx",
+          "operation": "modify",
+          "description": "Ensure all labels/instructions (including mode feedback) are English."
+        },
+        {
+          "path": "frontend/src/screens/SettingsScreen.tsx",
+          "operation": "modify",
+          "description": "Ensure all labels, helper text, and validation messages are English."
+        }
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "summary": "Include cohesive industrial-style static icon assets (species + optional logo) and render them in the UI as frontend static assets.",
+      "acceptanceCriteria": [
+        "Species Selection buttons each display a distinct, consistent-style icon.",
+        "Icons are included as static assets in the frontend and load without backend involvement.",
+        "A simple brand/logo mark is available for use in the dashboard header (optional but present as an asset)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/species-chicken.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated static asset for Chicken icon at frontend/public/assets/generated/species-chicken.dim_256x256.png and ensure it is referenced by the Species Selection UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/species-duck.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated static asset for Duck icon at frontend/public/assets/generated/species-duck.dim_256x256.png and ensure it is referenced by the Species Selection UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/species-quail.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated static asset for Quail icon at frontend/public/assets/generated/species-quail.dim_256x256.png and ensure it is referenced by the Species Selection UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/species-goose.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated static asset for Goose icon at frontend/public/assets/generated/species-goose.dim_256x256.png and ensure it is referenced by the Species Selection UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/species-custom.dim_256x256.png",
+          "operation": "create",
+          "description": "Add generated static asset for Custom icon at frontend/public/assets/generated/species-custom.dim_256x256.png and ensure it is referenced by the Species Selection UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/incubator-logo.dim_512x512.png",
+          "operation": "create",
+          "description": "Add generated static asset for the incubator logo mark at frontend/public/assets/generated/incubator-logo.dim_512x512.png and ensure it can be rendered in the dashboard header."
+        },
+        {
+          "path": "frontend/src/screens/SpeciesSelectionScreen.tsx",
+          "operation": "modify",
+          "description": "Wire the species icon assets (from frontend/public/assets/generated/) into the Species Selection buttons so each species displays the correct icon."
+        },
+        {
+          "path": "frontend/src/components/layout/PanelLayout.tsx",
+          "operation": "modify",
+          "description": "Render the optional incubator logo mark in the shared header area using frontend/public/assets/generated/incubator-logo.dim_512x512.png (as a static asset)."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "frontend/src/index.css": "Global styles with industrial dark theme using OKLCH color system, custom animations for gauges and transitions, and typography optimized for touchscreen readability.",
+  "frontend/tailwind.config.js": "Tailwind configuration extended with industrial color palette, custom font sizes for large displays, glow shadows, and touch-optimized spacing.",
+  "frontend/src/App.tsx": "Main application component managing screen navigation between Dashboard, Species Selection, and Settings with dark theme provider and toast notifications.",
+  "frontend/src/lib/esp32Client.ts": "HTTP client for ESP32 communication handling status polling and command requests with timeout, error handling, and CORS support.",
+  "frontend/src/state/useLocalSettings.ts": "React hook managing persistent local settings including ESP32 base URL, temperature, humidity, turning interval, and kiosk mode using localStorage.",
+  "frontend/src/state/useKioskMode.ts": "React hook for managing kiosk mode state with localStorage persistence to optimize UI for dedicated display.",
+  "frontend/src/hooks/useIncubatorStatus.ts": "React Query hook polling ESP32 /status endpoint every 3 seconds to fetch live incubation data.",
+  "frontend/src/hooks/useEsp32Commands.ts": "React Query mutations for ESP32 commands (manual turn, set temp/humidity/mode) with toast notifications and cache invalidation.",
+  "frontend/src/components/layout/PanelLayout.tsx": "Shared layout component providing consistent header, content area, and optional footer with kiosk mode support.",
+  "frontend/src/components/layout/ScreenTransition.tsx": "Simple wrapper component providing smooth fade-in transitions between screens.",
+  "frontend/src/components/gauges/CircularGauge.tsx": "Animated SVG circular gauge displaying temperature/humidity with smooth value transitions, status colors, and alarm pulse effects.",
+  "frontend/src/components/controls/BottomControlBar.tsx": "Touch-optimized bottom control bar with four large buttons for manual turn, species selection, settings, and alarm mute.",
+  "frontend/src/components/species/SpeciesTileButton.tsx": "Large touchscreen button displaying species icon and name for species selection screen.",
+  "frontend/src/components/help/HelpAboutPanel.tsx": "Help panel providing Android kiosk mode setup instructions including screen pinning and auto-start guidance.",
+  "frontend/src/screens/DashboardScreen.tsx": "Main dashboard displaying live gauges, incubation status, day counters, and bottom controls with offline/error handling.",
+  "frontend/src/screens/SpeciesSelectionScreen.tsx": "Species selection screen with large icon buttons for Chicken, Duck, Quail, Goose, and Custom modes.",
+  "frontend/src/screens/SettingsScreen.tsx": "Settings screen with sliders for temperature/humidity/turning interval, ESP32 URL configuration, kiosk mode toggle, and help documentation."
+}

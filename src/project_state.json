@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Android touchscreen kiosk-style UI app for an ESP32-controlled automatic egg incubator, showing live incubation parameters and allowing control commands over WiFi/HTTP with a professional industrial dark-themed dashboard.",
+  "architectural_notes": [
+    "ESP32 integration over WiFi using HTTP GET endpoints; poll /status every 3 seconds and parse JSON response to update UI."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Industrial line icon of a chicken (species-chicken.dim_256x256.png)\n- Industrial line icon of a duck (species-duck.dim_256x256.png)\n- Industrial line icon of a quail (species-quail.dim_256x256.png)\n- Industrial line icon of a goose (species-goose.dim_256x256.png)\n- Industrial line icon representing custom mode (species-custom.dim_256x256.png)\n- Minimal industrial incubator panel logo mark (incubator-logo.dim_512x512.png)",
+  "existing_features": [
+    {
+      "id": "feature-create-a-modern-industrial-looking-dark-theme-ui-system-colors-typography-spacing-components-that-is-consistent-across-all-screens-and-optimized-for-a-tablet-touchscreen-large-readable-typography-high-contrast-large-hit-targets-smooth-transitions-avoid-blue-purple-color-dominance",
+      "title": "Create a modern, industrial-looking dark theme UI system (colors, typography, spacing, components) that is consistent across all screens and optimized for a tablet touchscreen (large readable typography, high contrast, large hit targets, smooth transitions). Avoid blue/purple color dominance.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-main-dashboard-screen-showing-live-incubation-data-with-prominent-animated-circular-gauges-for-temperature-c-and-humidity-plus-incubation-day-day-x-of-21-days-remaining-current-system-status-text-heating-cooling-stable-alarm-and-egg-turning-countdown-timer-with-smooth-animations-for-gauge-updates-and-status-indicators",
+      "title": "Implement the Main Dashboard screen showing live incubation data with prominent animated circular gauges for temperature (°C) and humidity (%), plus incubation day (\"Day X of 21\"), days remaining, current system status text (Heating/Cooling/Stable/Alarm), and egg turning countdown timer, with smooth animations for gauge updates and status indicators.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-bottom-control-buttons-on-the-dashboard-manual-egg-turn-species-selection-settings-alarm-mute-styled-for-touch-and-visually-consistent-with-the-industrial-panel-theme",
+      "title": "Add bottom control buttons on the Dashboard: Manual Egg Turn, Species Selection, Settings, Alarm Mute, styled for touch and visually consistent with the industrial panel theme.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-the-species-selection-screen-with-large-icon-buttons-for-chicken-duck-quail-goose-and-custom-selecting-a-species-sends-a-preset-mode-command-to-the-controller-using-get-setmode-value-species-and-returns-the-user-to-the-dashboard-or-clearly-indicates-the-new-mode",
+      "title": "Create the Species Selection screen with large icon buttons for Chicken, Duck, Quail, Goose, and Custom; selecting a species sends a preset mode command to the controller using GET /setMode?value=SPECIES and returns the user to the Dashboard (or clearly indicates the new mode).",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-the-settings-screen-that-allows-the-user-to-set-temperature-slider-humidity-slider-and-egg-turning-interval-include-a-save-settings-button-that-sends-the-configured-values-to-the-controller-get-settemp-value-get-sethumidity-value-and-persists-the-chosen-settings-locally-for-the-ui-including-the-esp32-base-url-if-configurable",
+      "title": "Create the Settings screen that allows the user to set temperature (slider), humidity (slider), and egg turning interval; include a Save Settings button that sends the configured values to the controller (GET /setTemp?value=, GET /setHumidity?value=) and persists the chosen settings locally for the UI (including the ESP32 base URL if configurable).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-esp32-communication-layer-over-wifi-http-poll-get-status-every-3-seconds-parse-the-returned-json-and-update-all-ui-values-dynamically-across-screens-implement-command-requests-for-manualturn-settemp-value-sethumidity-value-setmode-value-with-user-visible-error-handling-and-loading-states",
+      "title": "Implement the ESP32 communication layer over WiFi HTTP: poll GET /status every 3 seconds, parse the returned JSON, and update all UI values dynamically across screens; implement command requests for /manualTurn, /setTemp?value=, /setHumidity?value=, /setMode?value= with user-visible error handling and loading states.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-simple-configuration-for-the-esp32-base-url-e-g-http-192-168-4-1-or-http-192-168-1-50-so-the-app-can-be-pointed-at-different-controllers-without-code-changes-the-base-url-must-be-editable-in-the-ui-e-g-within-settings-and-persisted-locally",
+      "title": "Add a simple configuration for the ESP32 base URL (e.g., http://192.168.4.1 or http://192.168.1.50) so the app can be pointed at different controllers without code changes; the base URL must be editable in the UI (e.g., within Settings) and persisted locally.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-a-kiosk-friendly-ui-mode-ensure-the-app-runs-well-full-screen-with-no-reliance-on-browser-chrome-uses-a-layout-suitable-for-permanent-display-and-includes-an-optional-on-screen-control-to-enter-exit-a-kiosk-ui-state-e-g-hides-nonessential-navigation-and-prevents-accidental-navigation-within-the-app-also-add-documentation-in-app-or-in-a-visible-help-about-section-describing-how-to-use-android-s-kiosk-pinning-options-to-keep-the-app-in-the-foreground-at-startup",
+      "title": "Provide a kiosk-friendly UI mode: ensure the app runs well full-screen with no reliance on browser chrome, uses a layout suitable for permanent display, and includes an optional on-screen control to enter/exit a \"kiosk UI\" state (e.g., hides nonessential navigation and prevents accidental navigation within the app). Also add documentation in-app or in a visible Help/About section describing how to use Android’s kiosk/pinning options to keep the app in the foreground at startup.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-app-navigation-with-three-primary-screens-dashboard-species-selection-settings-and-ensure-all-user-facing-text-is-in-english",
+      "title": "Add app navigation with three primary screens (Dashboard, Species Selection, Settings) and ensure all user-facing text is in English.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-include-a-small-set-of-cohesive-industrial-style-static-icon-assets-for-the-species-selection-buttons-chicken-duck-quail-goose-custom-and-an-optional-simple-incubator-panel-logo-mark-and-render-them-in-the-ui-from-frontend-static-assets",
+      "title": "Generate and include a small set of cohesive industrial-style static icon assets for the Species Selection buttons (Chicken, Duck, Quail, Goose, Custom) and an optional simple incubator panel logo mark, and render them in the UI from frontend static assets.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Main dashboard screen with dark industrial theme showing animated circular temp/humidity gauges, day/days remaining, status, and egg turning countdown plus control buttons (manual turn, species, settings, alarm mute)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Species selection screen with large icon buttons (Chicken, Duck, Quail, Goose, Custom) that sends mode preset command to controller",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Settings screen with sliders for temperature/humidity, egg turning interval, and save settings action",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "WiFi HTTP communication layer polling GET /status every 3 seconds and updating UI dynamically; send commands via GET /manualTurn, /setTemp?value=, /setHumidity?value=, /setMode?value=",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Kiosk mode support: auto-launch at device startup and prevent exiting to system UI",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Incubator Panel",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

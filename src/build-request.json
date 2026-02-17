@@ -1,0 +1,246 @@
+{
+  "kind": "build_request",
+  "title": "Industrial incubator touchscreen UI with ESP32 polling and controls",
+  "projectName": "Incubator Panel",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Create a modern, industrial-looking dark theme UI system (colors, typography, spacing, components) that is consistent across all screens and optimized for a tablet touchscreen (large readable typography, high contrast, large hit targets, smooth transitions). Avoid blue/purple color dominance.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Design a modern industrial dashboard layout with a dark professional theme.",
+          "Design the UI to look like a professional branded industrial incubator touchscreen panel with smooth transitions and readable large typography."
+        ]
+      },
+      "acceptanceCriteria": [
+        "All screens share a consistent dark industrial visual style (backgrounds, surfaces, borders, typography).",
+        "Primary interactive controls meet touch sizing expectations (e.g., large buttons, clear spacing).",
+        "Transitions between screens are smooth and consistent."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Implement the Main Dashboard screen showing live incubation data with prominent animated circular gauges for temperature (°C) and humidity (%), plus incubation day (\"Day X of 21\"), days remaining, current system status text (Heating/Cooling/Stable/Alarm), and egg turning countdown timer, with smooth animations for gauge updates and status indicators.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "MAIN DASHBOARD SCREEN",
+          "- Large animated circular temperature gauge (°C)",
+          "- Large animated circular humidity gauge (%)",
+          "- Incubation day (example: Day 12 of 21)",
+          "- Days remaining",
+          "- Current system status text (Heating / Cooling / Stable / Alarm)",
+          "- Egg turning countdown timer",
+          "Include smooth animations for gauge updates and status indicators."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Temperature and humidity are displayed as large circular gauges and animate smoothly when values change.",
+        "Dashboard shows Day X of 21 and days remaining using the latest polled data.",
+        "Dashboard shows system status text and visually distinguishes Alarm state (e.g., color/accent change) without relying solely on motion.",
+        "Egg turning countdown displays using the value returned from the controller (turn_time)."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Add bottom control buttons on the Dashboard: Manual Egg Turn, Species Selection, Settings, Alarm Mute, styled for touch and visually consistent with the industrial panel theme.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Add control buttons at the bottom:\n- Manual Egg Turn button\n- Species Selection button\n- Settings button\n- Alarm Mute button"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All four buttons are present on the Dashboard and are easily tappable on a tablet form factor.",
+        "Species Selection and Settings navigate to their respective screens.",
+        "Manual Egg Turn triggers the /manualTurn request and shows a clear success/error feedback state in the UI.",
+        "Alarm Mute button is present and provides visible feedback when tapped (even if it is a no-op pending device endpoint support)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Create the Species Selection screen with large icon buttons for Chicken, Duck, Quail, Goose, and Custom; selecting a species sends a preset mode command to the controller using GET /setMode?value=SPECIES and returns the user to the Dashboard (or clearly indicates the new mode).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "SPECIES SELECTION SCREEN",
+          "Create a screen with large icon buttons for:\n- Chicken\n- Duck\n- Quail\n- Goose\n- Custom",
+          "Selecting a species sends a preset command to the controller.",
+          "Send commands using:\nGET /setMode?value="
+        ]
+      },
+      "acceptanceCriteria": [
+        "Species Selection screen contains 5 large, clearly labeled icon buttons: Chicken, Duck, Quail, Goose, Custom.",
+        "Tapping a species issues GET /setMode?value=<SpeciesName> to the configured ESP32 base URL.",
+        "UI shows success/error feedback for mode change and reflects the updated mode from subsequent /status polling."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Create the Settings screen that allows the user to set temperature (slider), humidity (slider), and egg turning interval; include a Save Settings button that sends the configured values to the controller (GET /setTemp?value=, GET /setHumidity?value=) and persists the chosen settings locally for the UI (including the ESP32 base URL if configurable).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "SETTINGS SCREEN",
+          "- Set temperature using a slider",
+          "- Set humidity using a slider",
+          "- Set egg turning interval",
+          "- Save settings button",
+          "Send commands using:\nGET /setTemp?value=\nGET /setHumidity?value="
+        ]
+      },
+      "acceptanceCriteria": [
+        "Settings screen includes temperature slider, humidity slider, egg turning interval input/control, and a Save Settings button.",
+        "Pressing Save sends /setTemp?value=<temp> and /setHumidity?value=<humidity> to the ESP32 base URL and displays success/error feedback.",
+        "Settings chosen by the user persist across reloads (e.g., via local storage) and are used to initialize the Settings UI on next load."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Implement the ESP32 communication layer over WiFi HTTP: poll GET /status every 3 seconds, parse the returned JSON, and update all UI values dynamically across screens; implement command requests for /manualTurn, /setTemp?value=, /setHumidity?value=, /setMode?value= with user-visible error handling and loading states.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "COMMUNICATION",
+          "Read live data every 3 seconds from:\nGET /status",
+          "The ESP32 returns JSON:\n{\n \"temp\": 37.5,\n \"humidity\": 60,\n \"day\": 12,\n \"days_left\": 9,\n \"status\": \"Heating\",\n \"turn_time\": \"00:45\",\n \"mode\": \"Chicken\"\n}",
+          "Update all UI values dynamically.",
+          "Send commands using:\nGET /manualTurn\nGET /setTemp?value=\nGET /setHumidity?value=\nGET /setMode?value="
+        ]
+      },
+      "acceptanceCriteria": [
+        "The app polls /status every 3 seconds while on the Dashboard and keeps data fresh when navigating between screens (no stale UI).",
+        "The JSON fields temp, humidity, day, days_left, status, turn_time, mode are all displayed somewhere appropriate and update when the polled values change.",
+        "If the ESP32 is unreachable or returns invalid JSON, the UI shows a clear offline/error state without crashing.",
+        "Each command endpoint shows a loading state and a success/error result in the UI."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Add a simple configuration for the ESP32 base URL (e.g., http://192.168.4.1 or http://192.168.1.50) so the app can be pointed at different controllers without code changes; the base URL must be editable in the UI (e.g., within Settings) and persisted locally.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "The app communicates with an ESP32 controller over WiFi using HTTP requests."
+        ]
+      },
+      "acceptanceCriteria": [
+        "User can edit and save the ESP32 base URL from within the UI.",
+        "All polling and command requests use the saved base URL.",
+        "Base URL persists across reloads."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Provide a kiosk-friendly UI mode: ensure the app runs well full-screen with no reliance on browser chrome, uses a layout suitable for permanent display, and includes an optional on-screen control to enter/exit a \"kiosk UI\" state (e.g., hides nonessential navigation and prevents accidental navigation within the app). Also add documentation in-app or in a visible Help/About section describing how to use Android’s kiosk/pinning options to keep the app in the foreground at startup.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "DEVICE MODE\nThe application should support kiosk mode so the app launches automatically at device startup and prevents exiting to the system interface."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The UI renders cleanly in full-screen tablet dimensions and remains usable without page scrolling for the main dashboard controls.",
+        "There is a clear optional kiosk UI toggle/state that reduces accidental navigation within the app.",
+        "App includes user-facing guidance (English) on configuring Android kiosk/pinning behavior (acknowledging OS-level setup is required)."
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Add app navigation with three primary screens (Dashboard, Species Selection, Settings) and ensure all user-facing text is in English.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Use English for any user-facing text in the build request.",
+          "MAIN DASHBOARD SCREEN",
+          "SPECIES SELECTION SCREEN",
+          "SETTINGS SCREEN"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users can navigate between Dashboard, Species Selection, and Settings using the provided buttons.",
+        "All labels, buttons, and helper text shown in the UI are English."
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Generate and include a small set of cohesive industrial-style static icon assets for the Species Selection buttons (Chicken, Duck, Quail, Goose, Custom) and an optional simple incubator panel logo mark, and render them in the UI from frontend static assets.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Create a screen with large icon buttons for:\n- Chicken\n- Duck\n- Quail\n- Goose\n- Custom",
+          "Design the UI to look like a professional branded industrial incubator touchscreen panel"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Species Selection buttons each display a distinct, consistent-style icon.",
+        "Icons are included as static assets in the frontend and load without backend involvement.",
+        "A simple brand/logo mark is available for use in the dashboard header (optional but present as an asset)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Frontend must be implemented using the provided React + TypeScript + Tailwind + shadcn/ui + React Query stack; do not edit files under frontend/src/components/ui or other immutable paths listed in SYSTEM_CONTEXT.",
+    "Backend is a single Motoko actor; do not introduce additional backend services.",
+    "ESP32 communication is specified as HTTP GET endpoints (/status, /manualTurn, /setTemp, /setHumidity, /setMode).",
+    "If the ESP32 does not provide CORS headers for browser-based requests, the frontend may be unable to call it directly; the solution must not assume non-HTTPS canister outcalls from the Internet Computer to the ESP32."
+  ],
+  "nonGoals": [
+    "Implementing a native Android (Kotlin/Java) application package (APK) or true OS-level kiosk/Device Owner provisioning within Android.",
+    "Adding unmentioned ESP32 endpoints (e.g., /muteAlarm) or changing the ESP32 API contract.",
+    "Adding user accounts, authentication, or cloud sync."
+  ],
+  "imageRequirements": {
+    "required": [
+      "Industrial line icon of a chicken (species-chicken.dim_256x256.png)",
+      "Industrial line icon of a duck (species-duck.dim_256x256.png)",
+      "Industrial line icon of a quail (species-quail.dim_256x256.png)",
+      "Industrial line icon of a goose (species-goose.dim_256x256.png)",
+      "Industrial line icon representing custom mode (species-custom.dim_256x256.png)",
+      "Minimal industrial incubator panel logo mark (incubator-logo.dim_512x512.png)"
+    ],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}
